@@ -114,30 +114,6 @@ def account():
     image_file = url_for('static', filename='flaskblog/profile_pics/' + current_user.image_file)
     return render_template("account.html", title="Account", image_file=image_file, form=form)
 
-
-def gen_frames():
-    while True:
-        success, frame = video_capture.read()
-        if not success:
-            break
-        else:
-            # fr = FaceRecognition()
-            # name = fr.run_recognition()
-            # name = name.split('.')[0]
-            # print(name)
-            # return redirect(url_for('home'))
-            # if name:
-            #     user = User.query.filter_by(username=name).first()
-            #     if user:
-            #         login_user(user, remember=False)
-            #         next_page = request.args.get('next')
-            #         return redirect(next_page) if next_page else redirect(url_for('home'))
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-
     
 @app.route("/frlogin", methods=["GET", "POST"])
 def frlogin():
@@ -156,4 +132,3 @@ def frlogin():
         else:
             print('User not found')
     return redirect(url_for('home'))
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
