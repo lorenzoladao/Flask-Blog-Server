@@ -16,4 +16,3 @@ When registering you MUST add a clear photo of yourself for facial recognition t
 I would like to implement the following features
 * Upload Blog functionality
 * Delete accounts
-* Show camera screen when using facial recognition feature
