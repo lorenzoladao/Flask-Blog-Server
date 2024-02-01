@@ -37,8 +37,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class FR_LoginForm(FlaskForm):
-    username = StringField('Username', 
-                           validators=[DataRequired(), Length(min=2, max=20)])
+    submit = SubmitField('Recognize Face')
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', 

@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import math
 
-video_capture = cv2.VideoCapture(0)
+
 
 # Helper
 def face_confidence(face_distance, face_match_threshold=0.6):
@@ -40,10 +40,11 @@ class FaceRecognition:
             if image not in self.known_face_names:
                 self.known_face_encodings.append(face_encoding)
                 self.known_face_names.append(image)
-        # print(self.known_face_names)
 
     def run_recognition(self):
-        # video_capture = cv2.VideoCapture(0)
+        video_capture = cv2.VideoCapture(0)
+
+        
 
         if not video_capture.isOpened():
             sys.exit('Video source not found...')
@@ -80,7 +81,6 @@ class FaceRecognition:
 
                     if name != 'Unknown' and confidence != '???':
                         if confidence > 97:
-                            print(name, confidence)
                             video_capture.release()
                             cv2.destroyAllWindows()
                             return name

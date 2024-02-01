@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, Response
 from flaskblog import app, db, bcrypt
-from flaskblog.recognition import FaceRecognition, video_capture
+from flaskblog.recognition import FaceRecognition
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, FR_LoginForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
@@ -114,21 +114,54 @@ def account():
     image_file = url_for('static', filename='flaskblog/profile_pics/' + current_user.image_file)
     return render_template("account.html", title="Account", image_file=image_file, form=form)
 
-    
+
+def gen_frames():
+    camera = cv2.VideoCapture(0)
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            # fr = FaceRecognition()
+            # name = fr.run_recognition()
+            # name = name.split('.')[0]
+            # print(name)
+            # return redirect(url_for('home'))
+            # if name:
+            #     user = User.query.filter_by(username=name).first()
+            #     if user:
+            #         login_user(user, remember=False)
+            #         next_page = request.args.get('next')
+            #         return redirect(next_page) if next_page else redirect(url_for('home'))
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route("/video_feed")
+def video_feed():
+    return Response(gen_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+
 @app.route("/frlogin", methods=["GET", "POST"])
 def frlogin():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    fr = FaceRecognition()
-    name = fr.run_recognition()
-    name = name.split('.')[0]
-    print(name)
-    if name:
-        user = User.query.filter_by(username=name).first()
-        if user:
-            login_user(user, remember=False)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
-        else:
-            print('User not found')
-    return redirect(url_for('home'))
+    form = FR_LoginForm()
+    if form.validate_on_submit():
+        print("submit")
+        fr = FaceRecognition()
+        name = fr.run_recognition()
+        if name != None:
+            name = name.split('.')[0]
+            print(name)
+            if name:
+                user = User.query.filter_by(username=name).first()
+                if user:
+                    login_user(user, remember=False)
+                    next_page = request.args.get('next')
+                    return redirect(next_page) if next_page else redirect(url_for('home'))
+                else:
+                    print('User not found')
+    return render_template("frlogin.html", title="Facial Recognition Login", form=form)
+    
