@@ -122,17 +122,6 @@ def gen_frames():
         if not success:
             break
         else:
-            # fr = FaceRecognition()
-            # name = fr.run_recognition()
-            # name = name.split('.')[0]
-            # print(name)
-            # return redirect(url_for('home'))
-            # if name:
-            #     user = User.query.filter_by(username=name).first()
-            #     if user:
-            #         login_user(user, remember=False)
-            #         next_page = request.args.get('next')
-            #         return redirect(next_page) if next_page else redirect(url_for('home'))
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
@@ -149,19 +138,15 @@ def frlogin():
         return redirect(url_for('home'))
     form = FR_LoginForm()
     if form.validate_on_submit():
-        print("submit")
         fr = FaceRecognition()
         name = fr.run_recognition()
         if name != None:
             name = name.split('.')[0]
-            print(name)
             if name:
                 user = User.query.filter_by(username=name).first()
                 if user:
                     login_user(user, remember=False)
                     next_page = request.args.get('next')
                     return redirect(next_page) if next_page else redirect(url_for('home'))
-                else:
-                    print('User not found')
     return render_template("frlogin.html", title="Facial Recognition Login", form=form)
     
